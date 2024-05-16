@@ -1,12 +1,14 @@
 ﻿using CQRS.Application.Features.LeaveRequest.Commands;
 using CQRS.Application.Features.LeaveRequest.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CQRS.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Employee")]
     public class LeaveRequestsController : ControllerBase
     {
         private readonly IMediator _mediator;

@@ -1,12 +1,14 @@
 ﻿using CQRS.Application.Features.LeaveAllocation.Commands;
 using CQRS.Application.Features.LeaveAllocation.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CQRS.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class LeaveAllocationsController : ControllerBase
     {
         private readonly IMediator _mediator;

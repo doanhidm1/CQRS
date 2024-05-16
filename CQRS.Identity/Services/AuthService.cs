@@ -52,9 +52,9 @@ namespace CQRS.Identity.Services
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
             var claims = userClaims.ToList();
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
             var descriptor = new SecurityTokenDescriptor
@@ -64,7 +64,9 @@ namespace CQRS.Identity.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(jwtSettings.DurationInMinutes),
                 SigningCredentials = signingCredentials,
+                NotBefore = DateTime.UtcNow,
                 IssuedAt = DateTime.UtcNow,
+                Claims = new Dictionary<string, object> { { "UserId", user.Id } }
             };
             var token = new JsonWebTokenHandler().CreateToken(descriptor);
             return token;
@@ -82,14 +84,23 @@ namespace CQRS.Identity.Services
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
-
             if (!result.Succeeded)
             {
-                throw new BadRequestException($"{result.Errors}");
+                throw new BadRequestException(GetErrors(result.Errors));
             }
 
             await _userManager.AddToRoleAsync(user, "Employee");
             return new RegistrationResponse { UserId = user.Id };
+        }
+
+        private static string GetErrors(IEnumerable<IdentityError> errors)
+        {
+            var stringBuilder = new StringBuilder();
+            foreach (var error in errors)
+            {
+                stringBuilder.AppendLine(error.Description);
+            }
+            return stringBuilder.ToString();
         }
     }
 }

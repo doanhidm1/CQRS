@@ -1,12 +1,14 @@
 ﻿using CQRS.Application.Features.LeaveType.Commands;
 using CQRS.Application.Features.LeaveType.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CQRS.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class LeaveTypesController : ControllerBase
     {
         private readonly IMediator _mediator;

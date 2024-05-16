@@ -14,7 +14,6 @@ namespace CQRS.Persistence
             services.AddDbContext<HRDatabaseContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("HRDatabase"));
-                options.EnableSensitiveDataLogging();
             });
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

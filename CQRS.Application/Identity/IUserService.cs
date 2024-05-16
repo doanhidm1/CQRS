@@ -5,6 +5,6 @@ namespace CQRS.Application.Identity
     public interface IUserService
     {
         Task<List<Employee>> GetEmployees();
-        Task<Employee> GetEmployee(int userId);
+        Task<Employee> GetEmployee(string userId);
     }
 }
